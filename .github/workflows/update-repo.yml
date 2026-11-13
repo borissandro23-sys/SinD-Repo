@@ -1,0 +1,71 @@
+name: Update Sileo repository
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "debs/**"
+      - ".github/workflows/update-repo.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build-index:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Install Debian package tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y dpkg-dev
+
+      - name: Generate package indexes and Release metadata
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          mkdir -p debs
+          dpkg-scanpackages --multiversion debs /dev/null > Packages
+          gzip -9n -c Packages > Packages.gz
+
+          date -Ru > /tmp/release-date
+          packages_size=$(wc -c < Packages | tr -d ' ')
+          packages_gz_size=$(wc -c < Packages.gz | tr -d ' ')
+          packages_md5=$(md5sum Packages | cut -d ' ' -f 1)
+          packages_gz_md5=$(md5sum Packages.gz | cut -d ' ' -f 1)
+          packages_sha256=$(sha256sum Packages | cut -d ' ' -f 1)
+          packages_gz_sha256=$(sha256sum Packages.gz | cut -d ' ' -f 1)
+
+          {
+            echo "Origin: SinD"
+            echo "Label: SinD"
+            echo "Suite: stable"
+            echo "Version: 1.0"
+            echo "Codename: sind"
+            echo "Architectures: iphoneos-arm64"
+            echo "Components: main"
+            echo "Description: SinD rootless package repository"
+            echo "Date: $(cat /tmp/release-date)"
+            echo "MD5Sum:"
+            printf " %s %s Packages\n" "$packages_md5" "$packages_size"
+            printf " %s %s Packages.gz\n" "$packages_gz_md5" "$packages_gz_size"
+            echo "SHA256:"
+            printf " %s %s Packages\n" "$packages_sha256" "$packages_size"
+            printf " %s %s Packages.gz\n" "$packages_gz_sha256" "$packages_gz_size"
+          } > Release
+
+      - name: Commit updated repository metadata
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add Packages Packages.gz Release
+          if git diff --cached --quiet; then
+            echo "Repository metadata is already up to date."
+          else
+            git commit -m "Update Sileo repository indexes"
+            git push
+          fi
