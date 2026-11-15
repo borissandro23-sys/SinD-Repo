@@ -6,10 +6,10 @@ Codename: sind
 Architectures: iphoneos-arm64
 Components: main
 Description: SinD rootless package repository
-Date: Sun, 15 Nov 2026 07:21:01 +0000
+Date: Sun, 15 Nov 2026 07:27:26 +0000
 MD5Sum:
- 2bdb43ef24fa8cf72084b965dea680b3 625 Packages
- cb135dcec796aa04d24b01998b6839cf 427 Packages.gz
+ b28e1d742371fcfe3a15a72ff8ace152 1252 Packages
+ 95f62fd2ff42e57fbb0b765747e212d4 541 Packages.gz
 SHA256:
- 1fc89140669114dbb6c081fbdd69b8e6369daef55dd95f4bfebb77ebde176c63 625 Packages
- 5b672da78f744bbf2d0adaba761744b00b0f206a189d0761ab13e988b3708c62 427 Packages.gz
+ 9ccc490d5361de5ed7b433db9bd3b6b6484042ca8a4b4adddad5fc3d0a0eb151 1252 Packages
+ 6686147218ebcc5844e007adf5efcd60beddaffb63d01e78f98a96464be23727 541 Packages.gz
